@@ -8,10 +8,10 @@ from crawler.comp_fnguide import metric_crawler
 from util import const, mysql_manager, timer
 
 #################
-# 1. 매일 KRX에서 종목명/코드 수집
+# 1. 매일 KRX에서 종목명/코드 수집 : krx_crawler
 # 2. 종목별 주가 수집
-# 3. 종목별 fnguide 정보 수집
-# 4. 네이버 종목 분석 게시판 수집
+# 3. 종목별 fnguide 정보 수집 : metric_crawler
+# 4. 네이버 종목 분석 게시판 수집(애널리스트 리포트)
 # 5. 네이버에서 테마 정보 수집
 # 6. 네이버 종목 게시판의 게시글 조회수 수집(관심도)
 #################
