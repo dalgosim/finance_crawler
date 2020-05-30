@@ -43,5 +43,5 @@ def scheduler():
     sched.start()
 
 if __name__ == '__main__':
-    config.load_config()
+    config.load_config(run_type='test') # test, real
     scheduler()
