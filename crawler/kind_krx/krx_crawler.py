@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-from util import timer, logger, const #, mysql_controller
+from util import timer, logger, config #, mysql_controller
 from crawler import Crawler
 
 

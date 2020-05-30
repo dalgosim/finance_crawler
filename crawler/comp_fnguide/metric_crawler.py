@@ -6,7 +6,7 @@ import json
 import datetime
 import re
 from bs4 import BeautifulSoup
-from util import timer, logger, const #, mysql_controller
+from util import timer, logger, config #, mysql_controller
 from crawler import Crawler
 
 

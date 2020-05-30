@@ -1,9 +1,18 @@
 {
-    "MODEL_NAME":"",
-    "MYSQL_SVR":"",
-    "MYSQL_DB":"",
+    "MODEL_NAME":"metricstudio_xgb_20190816_kospi",
+    "MYSQL_SVR":"supermaria.cnxi7kgfk7nz.ap-northeast-2.rds.amazonaws.com",
+    "MYSQL_DB":"stock-screener",
     "PERIOD":{
         "metric_crawler":{"day_of_week":"weekday", "hour":"9-15", "minute":"0-59/30"},
         "krx_crawler":{"day_of_week":"weekday", "hour":"9-15", "minute":"0-59/30"}
+    },
+
+    "DATABASE":{
+        "COMPANY_LIST_TABLE":"company_list",
+        "PRICE_TABLE":"stock_price",
+        "METRIC_TABLE":"metric",
+        "NAVER_IN_TABLE":"naver_in_items",
+        "NAVER_OUT_TABLE":"naver_out_items",
+        "MODEL_RECOMMEND_TABLE":"recommended_items"
     }
 }

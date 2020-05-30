@@ -4,7 +4,7 @@ import pandas_datareader as pdr
 from datetime import datetime
 from pandas_datareader._utils import RemoteDataError
 
-from util import timer, logger, const #, mysql_controller
+from util import timer, logger, config #, mysql_controller
 from crawler import Crawler
 
 

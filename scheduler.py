@@ -4,8 +4,10 @@ import pandas as pd
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import crawler
 from crawler.comp_fnguide import metric_crawler
-from util import const, mysql_manager, timer
+from util import mysql_manager, timer
+from util import config
 
 #################
 # 1. 매일 KRX에서 종목명/코드 수집 : krx_crawler
@@ -16,14 +18,9 @@ from util import const, mysql_manager, timer
 # 6. 네이버 종목 게시판의 게시글 조회수 수집(관심도)
 #################
 
-def get_company_list():
-    _mysql = mysql_manager.MysqlController()
-    query = f'''SELECT distinct cmp_cd FROM {const.COMPANY_LIST_TABLE};'''
-    return _mysql.select_dataframe(query)
-
 def crawl_metric_daily():
     sp = metric_crawler.MetricCrawler()
-    cmp_list = get_company_list()['cmp_cd'].values.tolist()
+    cmp_list = crawler.get_company_list()['cmp_cd'].values.tolist()
 
     result_df = pd.DataFrame([])
     for _cmp in cmp_list:
@@ -46,4 +43,5 @@ def scheduler():
     sched.start()
 
 if __name__ == '__main__':
+    config.load_config()
     scheduler()
