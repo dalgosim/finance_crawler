@@ -11,13 +11,19 @@ def load_config(run_type='test', path='config.json'):
 
     # load scheduler config
     with open(path) as f:
-        jdata = json.load(f)
-        CONFIG = DotMap(jdata)
+        config_data = json.load(f)
     
     # load database config
     with open(AUTH_PATH) as f:
-        jdata = json.load(f)
-        CONFIG = DotMap(jdata)
-        CONFIG.MYSQL_SVR = CONFIG.REAL_DB if run_type.lower() == 'real' else CONFIG.DEV_DB
-        CONFIG.pop('REAL_DB')
-        CONFIG.pop('DEV_DB')
+        auth_data = json.load(f)
+
+        # 사용하는 설정만 남기고 지우기
+        if run_type.lower() == 'real':
+            auth_data['MYSQL_CONFIG'] = auth_data['MYSQL_SVR']['REAL_DB']
+        else:
+            auth_data['MYSQL_CONFIG'] = auth_data['MYSQL_SVR']['DEV_DB']
+        auth_data.pop('MYSQL_SVR')
+
+    # merge config
+    merged_dict = {**config_data, **auth_data}
+    CONFIG = DotMap(merged_dict)
