@@ -18,4 +18,6 @@ def load_config(run_type='test', path='config.json'):
     with open(AUTH_PATH) as f:
         jdata = json.load(f)
         CONFIG = DotMap(jdata)
-        CONFIG.DATABASE = CONFIG.REAL_DB if run_type.lower() == 'real' else CONFIG.DEV_DB
+        CONFIG.MYSQL_SVR = CONFIG.REAL_DB if run_type.lower() == 'real' else CONFIG.DEV_DB
+        CONFIG.pop('REAL_DB')
+        CONFIG.pop('DEV_DB')
