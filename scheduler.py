@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 import crawler
 from crawler.comp_fnguide import metric_crawler
+from crawler.kind_krx import krx_crawler
 from util import mysql_manager, timer
 from util import config
 
@@ -17,6 +18,12 @@ from util import config
 # 5. 네이버에서 테마 정보 수집
 # 6. 네이버 종목 게시판의 게시글 조회수 수집(관심도)
 #################
+
+def crawl_krxcode_daily():
+    krx = krx_crawler.KRXCrawler()
+    comp_list = krx.crawl()
+    print(len(comp_list))
+    print(comp_list.head())
 
 def crawl_metric_daily():
     sp = metric_crawler.MetricCrawler()
@@ -42,6 +49,13 @@ def scheduler():
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=weekday, hour='22')
     sched.start()
 
+def unit_test():
+    crawl_krxcode_daily() # 1
+    # crawl_metric_daily()
+    pass
+
 if __name__ == '__main__':
     config.load_config(run_type='test') # test, real
-    scheduler()
+    # scheduler()
+    # unit_test()
+    print(config.CONFIG.MYSQL_SVR.keys())
