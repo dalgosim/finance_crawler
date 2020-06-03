@@ -62,7 +62,7 @@ class MysqlController:
         self.logger.info(f'Select Datarame : {query}')
         return df
 
-    def insert_dataframe(self, df, table, index=False):
+    def insert_dataframe(self, df, table, index=False, ignore_duplicate=True):
         try:
             df.to_sql(name=table, con=self.engine, index=index, if_exists='append')
             self.logger.info(f'Insert Datarame into {table} : {len(df)}')
@@ -72,8 +72,8 @@ class MysqlController:
                 try:
                     row.to_sql(name=table, con=self.engine, index=index, if_exists='append')
                 except IntegrityError as e:
-                    # logger.debug(f'Duplicated Row ({table}) : {e.args[0]}')
-                    pass
+                    if not ignore_duplicate:
+                        self.logger.debug(f'Duplicated Row ({table}) : {e.args[0]}')
                 except Exception as e:
                     self.logger.error(f'Insert(In duplicated) Datarame Error ({table}) : {e}')
         except Exception as e:
