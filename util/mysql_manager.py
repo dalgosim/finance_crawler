@@ -5,26 +5,28 @@ import pandas as pd
 import pymysql
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import create_engine
-from util import const, logger
+from util import logger, config
 
 
 class MysqlController:
 
     def __init__(self):
-        # MySQL Connection 연결
         self.logger = logger.APP_LOGGER
-        self.conn = pymysql.connect(host=const.MYSQL_SVR,
-                                    user=const.MYSQL_USER,
-                                    password=const.MYSQL_PASSWD,
-                                    db=const.MYSQL_DB,
+
+        # MySQL Connection 연결
+        db_config = config.CONFIG.MYSQL_CONFIG
+        self.conn = pymysql.connect(host=db_config.MYSQL_HOST,
+                                    user=db_config.MYSQL_USER,
+                                    password=db_config.MYSQL_PASSWD,
+                                    db=db_config.MYSQL_DB,
                                     charset='utf8')
         self.curs = self.conn.cursor(pymysql.cursors.DictCursor)
         self.engine = create_engine(
                         '''mysql+pymysql://{user}:{passwd}@{svr}/{db_name}?charset=utf8'''.format(
-                            user=const.MYSQL_USER,
-                            passwd=const.MYSQL_PASSWD,
-                            svr=const.MYSQL_SVR,
-                            db_name=const.MYSQL_DB),
+                            user=db_config.MYSQL_USER,
+                            passwd=db_config.MYSQL_PASSWD,
+                            svr=db_config.MYSQL_HOST,
+                            db_name=db_config.MYSQL_DB),
                         encoding='utf8')
     def __del__(self):
         if self.conn is not None:
