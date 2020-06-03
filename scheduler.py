@@ -21,9 +21,7 @@ from util import config
 
 def crawl_krxcode_daily():
     krx = krx_crawler.KRXCrawler()
-    comp_list = krx.crawl()
-    print(len(comp_list))
-    print(comp_list.head())
+    krx.crawl(save=True)
 
 def crawl_metric_daily():
     sp = metric_crawler.MetricCrawler()
@@ -40,13 +38,13 @@ def crawl_metric_daily():
 
 # scheduler
 def scheduler():
-    weekday = 'mon-fri'
+    period = config.CONFIG.PERIOD
     sched = BackgroundScheduler({'apscheduler.timezone': 'Asia/Seoul'})
-    # sched.add_job(scheduler.run_screener, 'cron', day_of_week=weekday, hour='9')
+    sched.add_job(crawl_krxcode_daily, 'cron', day_of_week=period.krx_crawler.day_of_week, hour=period.krx_crawler.hour)
+    # sched.add_job(crawl_metric_daily, 'cron', day_of_week=weekday, hour='22')
     # sched.add_job(scheduler.infer_model, 'cron', day_of_week=weekday, hour='9')
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     # sched.add_job(scheduler.crawl_daily_price, 'cron', day_of_week=weekday, hour='15', minute='40')
-    sched.add_job(crawl_metric_daily, 'cron', day_of_week=weekday, hour='22')
     sched.start()
 
 def unit_test():
@@ -56,6 +54,6 @@ def unit_test():
 
 if __name__ == '__main__':
     config.load_config(run_type='test') # test, real
+    config.CONFIG.pprint(pformat='json')
     # scheduler()
-    # unit_test()
-    print(config.CONFIG.MYSQL_SVR.keys())
+    unit_test()
