@@ -1,7 +1,7 @@
 {
     "MODEL_NAME":"metricstudio_xgb_20190816_kospi",
     "PERIOD":{
-        "metric_crawler":{"day_of_week":"weekday", "hour":"9-15", "minute":"0-59/30"},
-        "krx_crawler":{"day_of_week":"weekday", "hour":"9-15", "minute":"0-59/30"}
+        "metric_crawler":{"day_of_week":"'mon-fri'", "hour":"9-15", "minute":"0-59/30"},
+        "krx_crawler":{"day_of_week":"mon-fri", "hour":"1"}
     }
 }
