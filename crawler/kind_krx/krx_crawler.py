@@ -40,5 +40,9 @@ class KRXCrawler(Crawler):
 
     def save(self, df):
         if df is not None:
+            self.logger.debug(f'KRX save start')
             table = config.CONFIG.MYSQL_CONFIG.TABLES.COMPANY_LIST_TABLE
             self.mysql.insert_dataframe(df, table)
+            self.logger.debug(f'KRX save start')
+        else:
+            self.logger.debug(f'KRX save fail : DataFrame is empty!')
