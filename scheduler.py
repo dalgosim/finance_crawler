@@ -20,14 +20,21 @@ from util import mysql_manager, timer, logger, config
 _logger = logger.APP_LOGGER
 
 def crawl_krxcode_daily():
+    '''KRX에서 종목 코드 가져오기'''
+    krx = krx_crawler.KRXCrawler()
+    krx.crawl(save=True)
+    _logger.debug(f'crawl_krxcode_daily job done')
+
+def crawl_price_daily():
+    '''yahoo finance에서 일자별 가격정보 가져오기'''
     krx = krx_crawler.KRXCrawler()
     krx.crawl(save=True)
     _logger.debug(f'crawl_krxcode_daily job done')
 
 def crawl_metric_daily():
+    '''fnguide에서 재무제표 가져오기'''
     sp = metric_crawler.MetricCrawler()
-    metric = sp.crawl(save=True)
-    print(metric)
+    sp.crawl(save=True)
     _logger.debug(f'crawl_metric_daily job done')
 
 
