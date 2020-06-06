@@ -7,8 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
-from util import mysql_manager, timer
-from util import config
+from util import mysql_manager, timer, logger, config
 
 #################
 # 1. 매일 KRX에서 종목명/코드 수집 : krx_crawler
@@ -18,22 +17,18 @@ from util import config
 # 5. 네이버에서 테마 정보 수집
 # 6. 네이버 종목 게시판의 게시글 조회수 수집(관심도)
 #################
+_logger = logger.APP_LOGGER
 
 def crawl_krxcode_daily():
     krx = krx_crawler.KRXCrawler()
     krx.crawl(save=True)
+    _logger.debug(f'crawl_krxcode_daily job done')
 
 def crawl_metric_daily():
     sp = metric_crawler.MetricCrawler()
-    cmp_list = crawler.get_company_list()['cmp_cd'].values.tolist()
-
-    result_df = pd.DataFrame([])
-    for _cmp in cmp_list:
-        _df = sp.crawl(_cmp[1:])
-        result_df = pd.concat([result_df, _df])
-    result_df['date'] = timer.get_now('%Y-%m-%d')
-    sp.save(result_df)
-    print(f'crawl_daily_metric job done : {datetime.datetime.now()}')
+    metric = sp.crawl(save=True)
+    print(metric)
+    _logger.debug(f'crawl_metric_daily job done')
 
 
 # scheduler
@@ -48,8 +43,8 @@ def scheduler():
     sched.start()
 
 def unit_test():
-    crawl_krxcode_daily() # 1
-    # crawl_metric_daily()
+    # crawl_krxcode_daily() # 1
+    crawl_metric_daily()
     pass
 
 if __name__ == '__main__':

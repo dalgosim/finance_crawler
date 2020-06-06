@@ -6,7 +6,8 @@ import json
 import datetime
 import re
 from bs4 import BeautifulSoup
-from util import timer, logger, config #, mysql_controller
+
+from util import timer, logger, config, mysql_manager, common_sql
 from crawler import Crawler
 
 
@@ -25,67 +26,76 @@ class MetricCrawler(Crawler):
         'stkGb': '701',
     }
 
-    def __init__(self, delay=1):
-        self.period = 'daily'
-        self.crawl_time = '22'
+    def __init__(self):
+        super().__init__()
+        self.crawl_date = timer.get_now('%Y-%m-%d')
 
-        self.logger = logger.APP_LOGGER
-        self.delay = delay
-        # self.mysql = mysql_controller.MysqlController()
-
-    def crawl(self, cmp_cd):
+    def crawl(self, save=False):
         self.logger.debug(f'Fnguide crawling start')
-
-        header = {
-            'Host': 'comp.fnguide.com',
-        }
+        limit = 0 if save else 5
         result = []
-        cmp_dict = dict()
-        gicode = 'A%06d'%int(cmp_cd)
-        cmp_dict['code'] = cmp_cd
+        cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
+        for cmp_cd in cmp_cd_list:
+            fncode = cmp_cd[:6] # .KS, .KQ 태그 제외
+            header = {
+                'Host': 'comp.fnguide.com',
+            }
+            cmp_row = dict()
+            gicode = 'A%06d'%int(fncode)
+            cmp_row['code'] = cmp_cd
 
-        for url in [self.INVEST_URL, self.FINANCE_RATIO_URL]:
-            res = requests.get(f'{url}?gicode={gicode}', headers=header)
-            soup = BeautifulSoup(res.text, 'lxml')
-            table_list = soup.find_all('table', attrs={'class': 'us_table_ty1'})
-            for tb in table_list:
-                trs = tb.find_all('tr')[1:]
-                for tr in trs:
-                    td = list(tr.children)
+            for url in [self.INVEST_URL, self.FINANCE_RATIO_URL]:
+                res = requests.get(f'{url}?gicode={gicode}', headers=header)
+                soup = BeautifulSoup(res.text, 'lxml')
+                table_list = soup.find_all('table', attrs={'class': 'us_table_ty1'})
+                for tb in table_list:
+                    trs = tb.find_all('tr')[1:]
+                    for tr in trs:
+                        td = list(tr.children)
 
-                    if int(td[1].attrs.get('colspan', 0)) > 0:
-                        continue
+                        if int(td[1].attrs.get('colspan', 0)) > 0:
+                            continue
 
-                    # 지표 key-value
-                    key = td[1].find_all('span', attrs={'class': 'txt_acd'})
-                    if len(key) > 0:
-                        key = key[0].text
-                    else:
-                        key = td[1].text
-                    key = key.strip()
+                        # 지표 key-value
+                        key = td[1].find_all('span', attrs={'class': 'txt_acd'})
+                        if len(key) > 0:
+                            key = key[0].text
+                        else:
+                            key = td[1].text
+                        key = key.strip()
 
-                    val = td[-2].text.strip()
-                    if key == 'EV/EBITDA':  # 1년주기여서, 작년기준으로 사용
-                        val = td[-4].text.strip()
-                    if len(val) > 0:
-                        try:
-                            cmp_dict[key] = float(val.replace(',', ''))
-                        except:
-                            pass
-        result.append(cmp_dict)
-
-        timer.random_sleep(min_delay=self.delay)
+                        val = td[-2].text.strip()
+                        if key == 'EV/EBITDA':  # 1년주기여서, 작년기준으로 사용
+                            val = td[-4].text.strip()
+                        if len(val) > 0:
+                            try:
+                                cmp_row[key] = float(val.replace(',', ''))
+                            except:
+                                pass
+            result.append(cmp_row)
+            timer.random_sleep(min_delay=self.delay)
 
         df_result = pd.DataFrame(result)
         try:
             df_result = df_result[['code', 'EPS', 'CFPS', 'BPS', 'SPS', 'EV/EBITDA', 'ROE']]
+            df_result = df_result.loc[df_result.isnull().sum(axis=1)<6, :]
         except KeyError:
             self.logger.debug(f"{df_result[['code']]}, KeyError : ['EV/EBITDA'] not in index")
             df_result = None
-
         self.logger.debug(f'Fnguide crawling complete')
+
+        if save:
+            self.save(df_result)
+
         return df_result
     
-    def save(self, price_df):
-        price_df = price_df.rename(columns={"code": "cmp_cd"})
-        # self.mysql.insert_dataframe(price_df, const.METRIC_TABLE)
+    def save(self, df):
+        if df is not None:
+            self.logger.debug(f'Fnguide save start')
+            df = df.rename(columns={"code": "cmp_cd"})
+            df['date'] = self.crawl_date
+            table = config.CONFIG.MYSQL_CONFIG.TABLES.METRIC_TABLE
+            self.mysql.insert_dataframe(df, table)
+            self.logger.debug(f'Fnguide save complete')
+        else:
+            self.logger.debug(f'Fnguide save fail : DataFrame is empty!')
