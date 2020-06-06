@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
+from util import logger, config, mysql_manager
 
-from util import logger
-from util import config, mysql_manager
 
 class Crawler:
     
-    def __init__(self, delay=1):
+    def __init__(self):
         self.logger = logger.APP_LOGGER
-        self.delay = delay
+        self.delay = config.CONFIG.CRAWL_DELAY
+        self.mysql = mysql_manager.MysqlController()
 
-    def crawl(self):
+    def crawl(self, save=False):
         pass
 
     def save(self):
         pass
 
-def get_company_list():
-    _mysql = mysql_manager.MysqlController()
-    query = f'''SELECT distinct cmp_cd FROM {config.CONFIG.DATABASE.COMPANY_LIST_TABLE};'''
-    return _mysql.select_dataframe(query)
