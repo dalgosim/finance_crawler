@@ -60,12 +60,14 @@ class MysqlController:
     def select_dataframe(self, query):
         self.logger.debug(f'Select Datarame : {query}')
         df = pd.read_sql(query, self.engine)
+        self.logger.debug(f'Select complete')
         return df
 
     def insert_dataframe(self, df, table, index=False, ignore_duplicate=True):
         try:
-            df.to_sql(name=table, con=self.engine, index=index, if_exists='append')
             self.logger.debug(f'Insert Datarame into {table} : {len(df)}')
+            df.to_sql(name=table, con=self.engine, index=index, if_exists='append')
+            self.logger.debug(f'Insert complete')
         except IntegrityError as e:
             for i in range(len(df)):
                 row = df.iloc[[i]]
