@@ -2,7 +2,7 @@
 import pandas as pd
 
 from crawler import Crawler
-from util import timer, logger, config, mysql_manager
+from util import timer, logger, config
 
 
 class KRXCrawler(Crawler):
@@ -13,8 +13,7 @@ class KRXCrawler(Crawler):
     }
 
     def __init__(self):
-        self.logger = logger.APP_LOGGER
-        self.mysql = mysql_manager.MysqlController()
+        super().__init__()
 
     def _get_download_corplist(self, market_type='kospi'):
         self.logger.debug(f'{market_type} crawling start')
