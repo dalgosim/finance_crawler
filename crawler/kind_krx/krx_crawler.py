@@ -17,7 +17,7 @@ class KRXCrawler(Crawler):
         self.mysql = mysql_manager.MysqlController()
 
     def _get_download_corplist(self, market_type='kospi'):
-        self.logger.info(f'{market_type} crawling start')
+        self.logger.debug(f'{market_type} crawling start')
         fmt = '{:06d}.KS' if market_type == 'kospi' else '{:06d}.KQ'
         _market_type = self.STOCK_TYPE[market_type]
         
@@ -26,7 +26,7 @@ class KRXCrawler(Crawler):
         _df = pd.read_html(url, header=0)[0]
         
         _df.종목코드 = _df.종목코드.map(fmt.format)
-        self.logger.info(f'{market_type} crawling finish')
+        self.logger.debug(f'{market_type} crawling finish')
         return _df
 
     def crawl(self, save=False):
