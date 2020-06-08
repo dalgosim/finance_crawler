@@ -2,7 +2,10 @@
 import json
 from dotmap import DotMap
 
+from util import timer
+
 CONFIG = DotMap()
+BASIS_DATE = timer.get_yesterday('%Y-%m-%d')
 
 def load_config(run_type='test', path='config.json'):
     global CONFIG
