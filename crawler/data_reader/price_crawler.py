@@ -21,7 +21,7 @@ class DataReaderCrawler(Crawler):
         start_date = end_date = self.basis_date
 
         price_df = pd.DataFrame([])
-        limit = 5 if save else 5
+        limit = 0 if save else 5
         cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
         for code in cmp_cd_list:
             try:
