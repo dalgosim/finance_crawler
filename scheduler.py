@@ -62,6 +62,7 @@ def unit_test():
 
 if __name__ == '__main__':
     config.load_config(run_type='test') # test, real
+    print(f'===== TEST_MODE : {config.TEST_MODE} =====')
     # config.CONFIG.pprint(pformat='json')
     # scheduler()
     unit_test()

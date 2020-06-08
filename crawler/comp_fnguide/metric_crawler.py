@@ -33,7 +33,7 @@ class MetricCrawler(Crawler):
 
     def crawl(self, save=False):
         self.logger.debug(f'Fnguide crawling start')
-        limit = 0 if save else 5
+        limit = 0 if config.TEST_MODE else 5
         result = []
         cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
         for cmp_cd in cmp_cd_list:
