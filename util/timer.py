@@ -12,3 +12,6 @@ def get_now(time_format='%Y-%m-%d %H:%M:%S'):
 def str2date(str_date, date_format='%Y-%m-%d'):
     return datetime.datetime.strptime(str_date, date_format)
 
+def get_yesterday(time_format='%Y-%m-%d %H:%M:%S'):
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    return yesterday.strftime(time_format)
