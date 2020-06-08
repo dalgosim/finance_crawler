@@ -4,25 +4,25 @@ import pandas_datareader as pdr
 from datetime import datetime
 from pandas_datareader._utils import RemoteDataError
 
-from util import timer, logger, config #, mysql_controller
 from crawler import Crawler
+from util import timer, logger, config, mysql_manager, common_sql
 
 
 class DataReaderCrawler(Crawler):
     '''data_reader를 활용해서 주가 정보 가져오기'''
 
     def __init__(self):
-        self.start_date = datetime(2005, 1, 1)
-        self.end_date = datetime(2019, 12, 31)
+        super().__init__()
+        self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
 
-    def crawl(self, comp_code_list, start_date=None, end_date=None):
-        if start_date is None:
-            start_date = timer.get_now('%Y-%m-%d')
-        if start_date is None:
-            end_date = start_date
+    def crawl(self, save=False):
+        self.logger.debug(f'Price crawling start')
+        start_date = end_date = config.BASIS_DATE
 
         price_df = pd.DataFrame([])
-        for _, code in enumerate(comp_code_list):
+        limit = 0 if save else 5
+        cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
+        for code in cmp_cd_list:
             try:
                 _df = pdr.DataReader(code, 'yahoo', start_date, end_date)
             except RemoteDataError:
@@ -30,10 +30,19 @@ class DataReaderCrawler(Crawler):
                 continue
             except KeyError:
                 continue
-            _df['code'] = code[:6]
+            _df['code'] = code
             price_df = pd.concat([price_df, _df])
+        self.logger.debug(f'Price crawling complete')
 
+        if save:
+            self.save(price_df)
         return price_df
 
-    def save(self):
-        pass
+    def save(self, df):
+        if df is not None:
+            self.logger.debug(f'Price save start')
+            df = df.rename(columns={"code": "cmp_cd"})
+            self.mysql.insert_dataframe(df, self.table)
+            self.logger.debug(f'Price save complete')
+        else:
+            self.logger.debug(f'Price save fail : DataFrame is empty!')
