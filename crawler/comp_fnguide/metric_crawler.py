@@ -28,7 +28,8 @@ class MetricCrawler(Crawler):
 
     def __init__(self):
         super().__init__()
-        self.crawl_date = timer.get_now('%Y-%m-%d')
+        self.basis_date = config.BASIS_DATE
+        self.table = config.CONFIG.MYSQL_CONFIG.TABLES.METRIC_TABLE
 
     def crawl(self, save=False):
         self.logger.debug(f'Fnguide crawling start')
@@ -42,7 +43,7 @@ class MetricCrawler(Crawler):
             }
             cmp_row = dict()
             gicode = 'A%06d'%int(fncode)
-            cmp_row['code'] = cmp_cd
+            cmp_row['cmp_cd'] = cmp_cd
 
             for url in [self.INVEST_URL, self.FINANCE_RATIO_URL]:
                 res = requests.get(f'{url}?gicode={gicode}', headers=header)
@@ -77,10 +78,10 @@ class MetricCrawler(Crawler):
 
         df_result = pd.DataFrame(result)
         try:
-            df_result = df_result[['code', 'EPS', 'CFPS', 'BPS', 'SPS', 'EV/EBITDA', 'ROE']]
+            df_result = df_result[['cmp_cd', 'EPS', 'CFPS', 'BPS', 'SPS', 'EV/EBITDA', 'ROE']]
             df_result = df_result.loc[df_result.isnull().sum(axis=1)<6, :]
         except KeyError:
-            self.logger.debug(f"{df_result[['code']]}, KeyError : ['EV/EBITDA'] not in index")
+            self.logger.debug(f"{df_result[['cmp_cd']]}, KeyError : ['EV/EBITDA'] not in index")
             df_result = None
         self.logger.debug(f'Fnguide crawling complete')
 
@@ -92,10 +93,8 @@ class MetricCrawler(Crawler):
     def save(self, df):
         if df is not None:
             self.logger.debug(f'Fnguide save start')
-            df = df.rename(columns={"code": "cmp_cd"})
-            df['date'] = self.crawl_date
-            table = config.CONFIG.MYSQL_CONFIG.TABLES.METRIC_TABLE
-            self.mysql.insert_dataframe(df, table)
+            df['date'] = self.basis_date
+            self.mysql.insert_dataframe(df, self.table)
             self.logger.debug(f'Fnguide save complete')
         else:
             self.logger.debug(f'Fnguide save fail : DataFrame is empty!')
