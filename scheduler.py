@@ -7,6 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
+from crawler.data_reader import price_crawler
 from util import mysql_manager, timer, logger, config
 
 #################
@@ -27,8 +28,8 @@ def crawl_krxcode_daily():
 
 def crawl_price_daily():
     '''yahoo finance에서 일자별 가격정보 가져오기'''
-    krx = krx_crawler.KRXCrawler()
-    krx.crawl(save=True)
+    drc = price_crawler.DataReaderCrawler()
+    drc.crawl(save=True)
     _logger.debug(f'crawl_krxcode_daily job done')
 
 def crawl_metric_daily():
@@ -37,11 +38,14 @@ def crawl_metric_daily():
     sp.crawl(save=True)
     _logger.debug(f'crawl_metric_daily job done')
 
+def update_date():
+    config.BASIS_DATE = timer.get_now('%Y-%m-%d')
 
 # scheduler
 def scheduler():
     period = config.CONFIG.PERIOD
     sched = BackgroundScheduler({'apscheduler.timezone': 'Asia/Seoul'})
+    sched.add_job(update_date, 'cron', day_of_week=period.update_date.day_of_week, hour=period.update_date.hour)
     sched.add_job(crawl_krxcode_daily, 'cron', day_of_week=period.krx_crawler.day_of_week, hour=period.krx_crawler.hour)
     # sched.add_job(crawl_metric_daily, 'cron', day_of_week=weekday, hour='22')
     # sched.add_job(scheduler.infer_model, 'cron', day_of_week=weekday, hour='9')
@@ -50,12 +54,14 @@ def scheduler():
     sched.start()
 
 def unit_test():
+
     # crawl_krxcode_daily() # 1
-    crawl_metric_daily()
+    crawl_price_daily() # 2
+    # crawl_metric_daily() # 3
     pass
 
 if __name__ == '__main__':
     config.load_config(run_type='test') # test, real
-    config.CONFIG.pprint(pformat='json')
+    # config.CONFIG.pprint(pformat='json')
     # scheduler()
     unit_test()
