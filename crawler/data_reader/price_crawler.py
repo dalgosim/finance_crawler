@@ -13,14 +13,15 @@ class DataReaderCrawler(Crawler):
 
     def __init__(self):
         super().__init__()
+        self.basis_date = config.BASIS_DATE
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
 
     def crawl(self, save=False):
         self.logger.debug(f'Price crawling start')
-        start_date = end_date = config.BASIS_DATE
+        start_date = end_date = self.basis_date
 
         price_df = pd.DataFrame([])
-        limit = 0 if save else 5
+        limit = 5 if save else 5
         cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
         for code in cmp_cd_list:
             try:
@@ -30,7 +31,7 @@ class DataReaderCrawler(Crawler):
                 continue
             except KeyError:
                 continue
-            _df['code'] = code
+            _df['cmp_cd'] = code
             price_df = pd.concat([price_df, _df])
         self.logger.debug(f'Price crawling complete')
 
@@ -41,7 +42,9 @@ class DataReaderCrawler(Crawler):
     def save(self, df):
         if df is not None:
             self.logger.debug(f'Price save start')
-            df = df.rename(columns={"code": "cmp_cd"})
+            df['date'] = self.basis_date
+            df.columns = [name.lower() for name in df.columns]
+            df = df.rename(columns={"adj close": "adj_close"})
             self.mysql.insert_dataframe(df, self.table)
             self.logger.debug(f'Price save complete')
         else:
