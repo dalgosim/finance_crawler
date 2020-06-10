@@ -17,7 +17,7 @@ class DataReaderCrawler(Crawler):
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
 
     def crawl(self, save=False):
-        self.logger.debug(f'Price crawling start')
+        self.logger.debug(f'Price crawling start ({self.basis_date})')
         start_date = end_date = self.basis_date
 
         price_df = pd.DataFrame([])
