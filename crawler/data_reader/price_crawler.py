@@ -23,7 +23,9 @@ class DataReaderCrawler(Crawler):
         price_df = pd.DataFrame([])
         limit = 0 if config.TEST_MODE else 5
         cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
-        for code in cmp_cd_list:
+        for i, code in enumerate(cmp_cd_list):
+            if i%100==0:
+                self.logger.debug(f'crawling... ({i}/{len(cmp_cd_list)})')
             try:
                 _df = pdr.DataReader(code, 'yahoo', start_date, end_date)
             except RemoteDataError:
@@ -33,6 +35,7 @@ class DataReaderCrawler(Crawler):
                 continue
             _df['cmp_cd'] = code
             price_df = pd.concat([price_df, _df])
+            timer.random_sleep(min_delay=self.delay)
         self.logger.debug(f'Price crawling complete')
 
         if save:

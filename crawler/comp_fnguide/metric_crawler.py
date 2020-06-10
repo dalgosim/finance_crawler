@@ -36,7 +36,9 @@ class MetricCrawler(Crawler):
         limit = 0 if config.TEST_MODE else 5
         result = []
         cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
-        for cmp_cd in cmp_cd_list:
+        for i, cmp_cd in enumerate(cmp_cd_list):
+            if i%100==0:
+                self.logger.debug(f'crawling... ({i}/{len(cmp_cd_list)})')
             fncode = cmp_cd[:6] # .KS, .KQ 태그 제외
             header = {
                 'Host': 'comp.fnguide.com',
