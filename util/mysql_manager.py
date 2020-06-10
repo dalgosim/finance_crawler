@@ -22,11 +22,12 @@ class MysqlController:
                                     charset='utf8')
         self.curs = self.conn.cursor(pymysql.cursors.DictCursor)
         self.engine = create_engine(
-                        '''mysql+pymysql://{user}:{passwd}@{svr}/{db_name}?charset={encoding}'''.format(
+                        '''mysql+pymysql://{user}:{passwd}@{svr}/{db_name}?charset={charset}'''.format(
                             user=db_config.MYSQL_USER,
                             passwd=db_config.MYSQL_PASSWD,
                             svr=db_config.MYSQL_HOST,
-                            db_name=db_config.MYSQL_DB),
+                            db_name=db_config.MYSQL_DB,
+                            charset='utf8'),
                             encoding='utf8')
     def __del__(self):
         if self.conn is not None:
