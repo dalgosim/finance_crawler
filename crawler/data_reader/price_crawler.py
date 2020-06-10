@@ -25,7 +25,7 @@ class DataReaderCrawler(Crawler):
         cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
         for i, code in enumerate(cmp_cd_list):
             if i%100==0:
-                self.logger.debug(f'crawling... ({i}/{len(cmp_cd_list)})')
+                self.logger.debug(f'price crawling... ({i}/{len(cmp_cd_list)})')
             try:
                 _df = pdr.DataReader(code, 'yahoo', start_date, end_date)
             except RemoteDataError:
