@@ -11,6 +11,17 @@ class KRXCrawler(Crawler):
         'kospi': 'stockMkt',
         'kosdaq': 'kosdaqMkt'
     }
+    COL_DICT = {
+        '회사명':'cmp_nm_kor',
+        '종목코드':'cmp_cd',
+        '업종':'category',
+        '주요제품':'major_product',
+        '상장일':'regi_date',
+        '결산월':'settlement_month',
+        '대표자명':'representative',
+        '홈페이지':'website',
+        '지역':'location',
+    }
 
     def __init__(self):
         super().__init__()
@@ -32,7 +43,8 @@ class KRXCrawler(Crawler):
         kospi_df = self._get_download_corplist('kospi')
         kosdaq_df = self._get_download_corplist('kosdaq')
         comp_df = pd.concat([kospi_df, kosdaq_df])
-        comp_df = comp_df.rename(columns={'회사명':'cmp_nm_kor', '종목코드':'cmp_cd'})
+        comp_df = comp_df.rename(columns=self.COL_DICT)
+
         if save:
             self.save(comp_df)
         return comp_df
