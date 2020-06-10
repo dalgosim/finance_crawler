@@ -4,7 +4,7 @@
         "update_date":{"day_of_week":"mon-sun", "hour":"8,20"},
         "krx_crawler":{"day_of_week":"mon-fri", "hour":"21"},
         "price_crawler":{"day_of_week":"'mon-fri'", "hour":"22"},
-        "metric_crawler":{"day_of_week":"'mon-fri'", "hour":"23"}
+        "metric_crawler":{"day_of_week":"'mon-fri'", "hour":"22"}
     },
     "CRAWL_DELAY":1
 }
