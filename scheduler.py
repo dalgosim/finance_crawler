@@ -8,6 +8,7 @@ import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
 from crawler.data_reader import price_crawler
+from screener import screener
 from util import mysql_manager, timer, logger, config
 
 #################
@@ -17,6 +18,7 @@ from util import mysql_manager, timer, logger, config
 # 4. 네이버 종목 분석 게시판 수집(애널리스트 리포트)
 # 5. 네이버에서 테마 정보 수집
 # 6. 네이버 종목 게시판의 게시글 조회수 수집(관심도)
+# 7. 학습한 모델로 inference후 저장
 #################
 _logger = logger.APP_LOGGER
 
@@ -38,6 +40,13 @@ def crawl_metric_daily():
     sp.crawl(save=True)
     _logger.debug(f'crawl_metric_daily job done')
 
+def infer_model_daily():
+    '''model inference후 저장'''
+    scr = screener.Screener()
+    items = scr.recommend(save=False)
+    print(items.head())
+    _logger.debug(f'infer_model_daily job done')
+
 def update_date():
     config.BASIS_DATE = timer.get_now('%Y-%m-%d')
 
@@ -54,13 +63,15 @@ def scheduler():
 
 def unit_test():
     # update_date()
-    crawl_krxcode_daily() # 1
-    crawl_price_daily() # 2
-    crawl_metric_daily() # 3
+    # crawl_krxcode_daily() # 1
+    # crawl_price_daily() # 2
+    # crawl_metric_daily() # 3
+    infer_model_daily()
+
     pass
 
 if __name__ == '__main__':
-    config.load_config(run_type='test') # test, real
+    config.load_config(run_type='real') # test, real
     # config.CONFIG.pprint(pformat='json')
     # scheduler()
     unit_test()
