@@ -47,22 +47,20 @@ def scheduler():
     sched = BackgroundScheduler({'apscheduler.timezone': 'Asia/Seoul'})
     sched.add_job(update_date, 'cron', day_of_week=period.update_date.day_of_week, hour=period.update_date.hour)
     sched.add_job(crawl_krxcode_daily, 'cron', day_of_week=period.krx_crawler.day_of_week, hour=period.krx_crawler.hour)
-    # sched.add_job(crawl_metric_daily, 'cron', day_of_week=weekday, hour='22')
-    # sched.add_job(scheduler.infer_model, 'cron', day_of_week=weekday, hour='9')
+    sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
+    sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
-    # sched.add_job(scheduler.crawl_daily_price, 'cron', day_of_week=weekday, hour='15', minute='40')
     sched.start()
 
 def unit_test():
-
-    # crawl_krxcode_daily() # 1
+    # update_date()
+    crawl_krxcode_daily() # 1
     crawl_price_daily() # 2
-    # crawl_metric_daily() # 3
+    crawl_metric_daily() # 3
     pass
 
 if __name__ == '__main__':
     config.load_config(run_type='test') # test, real
-    print(f'===== TEST_MODE : {config.TEST_MODE} =====')
     # config.CONFIG.pprint(pformat='json')
     # scheduler()
     unit_test()
