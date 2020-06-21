@@ -42,7 +42,7 @@ class Screener:
                     AND t1.date=t2.date
                     AND t1.date={today_query}) m1
             WHERE
-                right(t3.cmp_cd,6)=m1.cmp_cd;'''
+                t3.cmp_cd=m1.cmp_cd;'''
 
         # 데이터 가져와서
         metric_df = self.mysql.select_dataframe(query)
