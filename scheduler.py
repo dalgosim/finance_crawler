@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
 import pickle
 import pandas as pd
+import time
 import datetime
+import argparse
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import crawler
@@ -43,8 +46,7 @@ def crawl_metric_daily():
 def infer_model_daily():
     '''model inference후 저장'''
     scr = screener.Screener()
-    items = scr.recommend(save=False)
-    print(items.head())
+    scr.recommend(save=True)
     _logger.debug(f'infer_model_daily job done')
 
 def update_date():
@@ -58,6 +60,7 @@ def scheduler():
     sched.add_job(crawl_krxcode_daily, 'cron', day_of_week=period.krx_crawler.day_of_week, hour=period.krx_crawler.hour)
     sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
+    sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     sched.start()
 
@@ -67,11 +70,22 @@ def unit_test():
     # crawl_price_daily() # 2
     # crawl_metric_daily() # 3
     infer_model_daily()
-
     pass
 
 if __name__ == '__main__':
-    config.load_config(run_type='real') # test, real
-    # config.CONFIG.pprint(pformat='json')
-    # scheduler()
-    unit_test()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run_type', required=True, choices=['real', 'test'], help='실행모드 입니다.')
+    args = parser.parse_args()
+
+    config.load_config(run_type=args.run_type) # test, real
+    config.CONFIG.pprint(pformat='json')
+
+    try:
+        print('start!')
+        unit_test()
+        # scheduler()
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        # Ctrl+C 입력시 예외 발생
+        sys.exit() #종료
