@@ -1,3 +1,9 @@
 numpy
 pandas
 dotmap
+apscheduler
+pymysql
+sqlalchemy
+xgboost
+beautifulsoup4
+pandas_datareader
