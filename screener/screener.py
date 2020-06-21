@@ -56,7 +56,7 @@ class Screener:
         metric_df['model'] = self.model_name
 
         if save:
-            self.save(metric_df)
+            self.save(metric_df[['cmp_cd', 'date', 'pos', 'neg', 'pred', 'close', 'model']])
 
         return metric_df
 
