@@ -78,12 +78,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config.load_config(run_type=args.run_type) # test, real
-    config.CONFIG.pprint(pformat='json')
+    print('Basis date :', config.BASIS_DATE)
+    # config.CONFIG.pprint(pformat='json')
 
     try:
         print('start!')
-        unit_test()
-        # scheduler()
+        # unit_test()
+        scheduler()
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
