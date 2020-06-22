@@ -6,13 +6,17 @@ from util import timer, logger
 
 _logger = logger.APP_LOGGER
 CONFIG = DotMap()
-BASIS_DATE = timer.get_yesterday('%Y-%m-%d')
+BASIS_DATE = timer.get_now('%Y-%m-%d')
 TEST_MODE = True
 
 def load_config(run_type='test', path='config.json'):
-    global CONFIG, TEST_MODE
+    global CONFIG, TEST_MODE, BASIS_DATE
 
     AUTH_PATH = './auth/mysql_auth.json'
+
+    # set date
+    if timer.get_now_hour() < 16: #4시 이전에는 전날 기준으로 가져오기
+        BASIS_DATE = timer.get_yesterday('%Y-%m-%d')
 
     # load scheduler config
     with open(path) as f:
