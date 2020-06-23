@@ -58,7 +58,7 @@ class MysqlController:
     def delete(self, query):
         self.update(query)
 
-    def select_dataframe(self, query):
+    def select_dataframe(self, query, log=''):
         self.logger.debug(f'Select Datarame : {query}')
         df = pd.read_sql(query, self.engine)
         self.logger.debug(f'Select complete')

@@ -45,7 +45,7 @@ class Screener:
                 t3.cmp_cd=m1.cmp_cd;'''
 
         # 데이터 가져와서
-        metric_df = self.mysql.select_dataframe(query)
+        metric_df = self.mysql.select_dataframe(query, log='screener')
         if len(metric_df) == 0:
             return None
 
