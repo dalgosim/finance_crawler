@@ -31,12 +31,12 @@ class Screener:
                                 FROM metric
                                 ORDER BY date DESC
                                 LIMIT 1)'''
-        
+        tables = config.CONFIG.MYSQL_CONFIG.TABLES
         query = f'''
             SELECT t3.cmp_nm_kor as cmp_nm_kor, m1.*
             FROM
-                company_list t3, (SELECT t1.*, t2.close
-                FROM metric t1, stock_price t2
+                {tables.COMPANY_LIST_TABLE} t3, (SELECT t1.*, t2.close
+                FROM {tables.METRIC_TABLE} t1, {tables.PRICE_TABLE} t2
                 WHERE
                     t1.cmp_cd=t2.cmp_cd
                     AND t1.date=t2.date
