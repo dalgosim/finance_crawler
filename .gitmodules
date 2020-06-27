@@ -4,3 +4,6 @@
 [submodule "finance_ml"]
 	path = finance_ml
 	url = https://github.com/dalgosim/finance_ml.git
+[submodule "dev_util"]
+	path = dev_util
+	url = https://github.com/dalgosim/dev_util.git
