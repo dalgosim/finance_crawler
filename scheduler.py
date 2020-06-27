@@ -12,7 +12,7 @@ from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
 from crawler.data_reader import price_crawler
 from screener import screener
-from util import mysql_manager, timer, logger, config
+from dev_util.util import mysql_manager, timer, logger, config
 
 #################
 # 1. 매일 KRX에서 종목명/코드 수집 : krx_crawler

@@ -5,7 +5,7 @@ import datetime
 import xgboost as xgb
 import pickle
 
-from util import logger, mysql_manager, timer, config
+from dev_util.util import logger, mysql_manager, timer, config
 
 
 class Screener:

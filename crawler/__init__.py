@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from util import logger, config, mysql_manager
+from dev_util.util import logger, config, mysql_manager
 
 
 class Crawler:

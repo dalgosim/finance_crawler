@@ -2,7 +2,7 @@
 import pandas as pd
 
 from crawler import Crawler
-from util import timer, logger, config
+from dev_util.util import timer, logger, config
 
 
 class KRXCrawler(Crawler):

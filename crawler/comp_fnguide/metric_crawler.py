@@ -7,7 +7,7 @@ import datetime
 import re
 from bs4 import BeautifulSoup
 
-from util import timer, logger, config, mysql_manager, common_sql
+from dev_util.util import timer, logger, config, mysql_manager, common_sql
 from crawler import Crawler
 
 
