@@ -40,7 +40,7 @@ class Screener:
                 WHERE
                     t1.cmp_cd=t2.cmp_cd
                     AND t1.date=t2.date
-                    AND t1.date={today_query}) m1
+                    AND t1.date='{today_query}') m1
             WHERE
                 t3.cmp_cd=m1.cmp_cd;'''
 
