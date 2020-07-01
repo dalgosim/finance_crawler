@@ -15,6 +15,7 @@ class Screener:
         self.model_name = config.CONFIG.MODEL_NAME
         self.model = self._load_model(self.model_name)
         self.mysql = mysql_manager.MysqlController()
+        self.basis_date = config.BASIS_DATE
         if self.model is None:
             self.logger.error("The model is not exist. Please check your model name")
 
@@ -24,13 +25,7 @@ class Screener:
             model = pickle.load(f)
         return model
 
-    def recommend(self, today=None, save=False):
-        today_query = today
-        if today is None:
-            today_query = '''(SELECT date
-                                FROM metric
-                                ORDER BY date DESC
-                                LIMIT 1)'''
+    def recommend(self, save=False):
         tables = config.CONFIG.MYSQL_CONFIG.TABLES
         query = f'''
             SELECT t3.cmp_nm_kor as cmp_nm_kor, m1.*
@@ -40,7 +35,7 @@ class Screener:
                 WHERE
                     t1.cmp_cd=t2.cmp_cd
                     AND t1.date=t2.date
-                    AND t1.date='{today_query}') m1
+                    AND t1.date='{self.basis_date}') m1
             WHERE
                 t3.cmp_cd=m1.cmp_cd;'''
 
