@@ -53,6 +53,7 @@ class KRXCrawler(Crawler):
         if df is not None:
             self.logger.debug(f'KRX save start')
             table = config.CONFIG.MYSQL_CONFIG.TABLES.COMPANY_LIST_TABLE
+            df.to_csv(f'log/comp_{self.basis_date}.csv', mode='w')
             self.mysql.insert_dataframe(df, table)
             self.logger.debug(f'KRX save start')
         else:

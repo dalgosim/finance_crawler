@@ -13,7 +13,6 @@ class DataReaderCrawler(Crawler):
 
     def __init__(self):
         super().__init__()
-        self.basis_date = config.BASIS_DATE
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
 
     def crawl(self, save=False):
@@ -48,6 +47,7 @@ class DataReaderCrawler(Crawler):
             df['date'] = self.basis_date
             df.columns = [name.lower() for name in df.columns]
             df = df.rename(columns={"adj close": "adj_close"})
+            df.to_csv(f'log/price_{self.basis_date}.csv', mode='w')
             self.mysql.insert_dataframe(df, self.table)
             self.logger.debug(f'Price save complete')
         else:

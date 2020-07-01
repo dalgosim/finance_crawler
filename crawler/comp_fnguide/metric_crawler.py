@@ -28,7 +28,6 @@ class MetricCrawler(Crawler):
 
     def __init__(self):
         super().__init__()
-        self.basis_date = config.BASIS_DATE
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.METRIC_TABLE
 
     def crawl(self, save=False):
@@ -96,6 +95,7 @@ class MetricCrawler(Crawler):
         if df is not None:
             self.logger.debug(f'Fnguide save start')
             df['date'] = self.basis_date
+            df.to_csv(f'log/metric_{self.basis_date}.csv', mode='w')
             self.mysql.insert_dataframe(df, self.table)
             self.logger.debug(f'Fnguide save complete')
         else:
