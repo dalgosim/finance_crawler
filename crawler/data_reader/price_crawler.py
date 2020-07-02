@@ -35,7 +35,7 @@ class DataReaderCrawler(Crawler):
             except KeyError:
                 _df = self.naver_price.crawl(code[:6])
             _df['cmp_cd'] = code
-            price_df = pd.concat([price_df, _df])
+            price_df = pd.concat([price_df, _df], sort=False)
             timer.random_sleep(min_delay=self.delay)
         self.logger.debug(f'Price crawling complete')
 
