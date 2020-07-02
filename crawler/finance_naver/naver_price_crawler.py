@@ -47,7 +47,7 @@ class NaverPriceCrawler(Crawler):
 
     def crawl(self, cmp_cd):
         code = cmp_cd[:6]
-        self.logger.debug(f'Price crawling start ({self.basis_date})')
+        self.logger.debug(f'Price crawling start ({cmp_cd}, {self.basis_date})')
 
         stock_price = self.__crawl_stock_price(code, max_page=1)
         price_df = pd.DataFrame(stock_price, columns=self.headers)
