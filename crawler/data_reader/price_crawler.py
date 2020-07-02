@@ -5,6 +5,7 @@ from datetime import datetime
 from pandas_datareader._utils import RemoteDataError
 
 from crawler import Crawler
+from crawler.finance_naver import naver_price_crawler
 from dev_util.util import timer, logger, config, mysql_manager, common_sql
 
 
@@ -14,6 +15,7 @@ class DataReaderCrawler(Crawler):
     def __init__(self):
         super().__init__()
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
+        self.naver_price = naver_price_crawler.NaverPriceCrawler()
 
     def crawl(self, save=False):
         self.logger.debug(f'Price crawling start ({self.basis_date})')
@@ -31,7 +33,7 @@ class DataReaderCrawler(Crawler):
                 # 상폐등으로 해당 기간에 데이터가 없을 때
                 continue
             except KeyError:
-                continue
+                _df = self.naver_price.crawl(code[:6])
             _df['cmp_cd'] = code
             price_df = pd.concat([price_df, _df])
             timer.random_sleep(min_delay=self.delay)
