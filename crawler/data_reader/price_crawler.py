@@ -14,6 +14,7 @@ class DataReaderCrawler(Crawler):
 
     def __init__(self):
         super().__init__()
+        self.price_column = ['date', 'cmp_cd', 'open', 'close', 'high', 'low', 'adj_close', 'volume']
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
         self.naver_price = naver_price_crawler.NaverPriceCrawler()
 
@@ -49,6 +50,7 @@ class DataReaderCrawler(Crawler):
             df['date'] = self.basis_date
             df.columns = [name.lower() for name in df.columns]
             df = df.rename(columns={"adj close": "adj_close"})
+            df = df[self.price_column]
             df.to_csv(f'log/price_{self.basis_date}.csv', mode='w')
             self.mysql.insert_dataframe(df, self.table)
             self.logger.debug(f'Price save complete')
