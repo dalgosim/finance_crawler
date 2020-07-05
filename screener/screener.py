@@ -37,7 +37,8 @@ class Screener:
                     AND t1.date=t2.date
                     AND t1.date='{self.basis_date}') m1
             WHERE
-                t3.cmp_cd=m1.cmp_cd;'''
+                t3.cmp_cd=m1.cmp_cd
+                AND close IS NOT NULL;'''
 
         # 데이터 가져와서
         metric_df = self.mysql.select_dataframe(query, log='screener')
