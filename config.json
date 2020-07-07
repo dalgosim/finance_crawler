@@ -7,5 +7,5 @@
         "metric_crawler":{"day_of_week":"mon-fri", "hour":"22"},
         "model_infer":{"day_of_week":"mon-fri", "hour":"8"}
     },
-    "CRAWL_DELAY":2
+    "CRAWL_DELAY":3
 }
