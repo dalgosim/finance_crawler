@@ -3,6 +3,7 @@ import pandas as pd
 import pandas_datareader as pdr
 from datetime import datetime
 from pandas_datareader._utils import RemoteDataError
+from requests.exceptions import ChunkedEncodingError
 
 from crawler import Crawler
 from crawler.finance_naver import naver_price_crawler
@@ -33,7 +34,7 @@ class DataReaderCrawler(Crawler):
             except RemoteDataError:
                 # 상폐등으로 해당 기간에 데이터가 없을 때
                 continue
-            except KeyError:
+            except (KeyError, ChunkedEncodingError):
                 _df = self.naver_price.crawl(code[:6])
             _df['cmp_cd'] = code
             price_df = pd.concat([price_df, _df], sort=False)
