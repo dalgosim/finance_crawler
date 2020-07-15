@@ -37,11 +37,17 @@ def crawl_price_daily():
     drc.crawl(save=True)
     _logger.debug(f'crawl_krxcode_daily job done')
 
+    # infer
+    infer_model_daily()
+
 def crawl_metric_daily():
     '''fnguide에서 재무제표 가져오기'''
     sp = metric_crawler.MetricCrawler()
     sp.crawl(save=True)
     _logger.debug(f'crawl_metric_daily job done')
+
+    # infer
+    infer_model_daily()
 
 def infer_model_daily():
     '''model inference후 저장'''
@@ -60,7 +66,7 @@ def scheduler():
     sched.add_job(crawl_krxcode_daily, 'cron', day_of_week=period.krx_crawler.day_of_week, hour=period.krx_crawler.hour)
     sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
-    sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
+    # sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     sched.start()
 
