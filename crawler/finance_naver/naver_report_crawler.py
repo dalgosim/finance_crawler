@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
+from namedentities import *
 
 from crawler import Crawler
 from dev_util.util import timer, logger, config, mysql_manager, common_sql
@@ -22,7 +23,28 @@ class NaverReportCrawler(Crawler):
                         'body']
         self.check_redun = dict()
         self.cmp_patt = re.compile("code=([0-9]{6})")
-        self.nid_patt = re.compile("nid=([0-9]{5})")
+        self.nid_patt = re.compile("nid=([0-9]{1,8})")
+        self.stopword = {
+            '\xa0':' '
+        }
+    
+    def __replace_stopword(self, text):
+        for key in self.stopword.keys():
+            text = text.replace(key, self.stopword[key])
+        text = self.__replace_unicode_symbol(text)
+        return text
+    
+    def __replace_unicode_symbol(self, text):
+        bt = bytes(text, 'utf-8')
+        try:
+            while bt.index(b'\xf4') > -1:
+                idx = bt.index(b'\xf4')
+                unicode_char = bt[idx:idx+4]
+                bt = bt.replace(unicode_char, '□'.encode('utf-8'))
+                text = bt.decode('utf-8')
+        except ValueError:
+            pass
+        return text
 
     def __crawl_report(self, max_page=10):
         report_list = []
@@ -54,17 +76,25 @@ class NaverReportCrawler(Crawler):
                     items.append(report_code)
                     if self.check_redun.get(report_code, True): # 중복 리포트는 제외
                         items.extend(self.__crawl_detail(report_code))
+                        items[1] = self.__replace_stopword(items[1]) # title
                         item_list.append(items)
                         self.check_redun[report_code] = False
-                    break
+                    # break
         return item_list
 
     def __parse_detail_page(self, res_text):
         soup = BeautifulSoup(res_text, 'lxml')
-        goal_price = soup.find_all('em', attrs={'class': 'money'})[0].text.strip().replace('원', '')
+        goal_price = soup.find_all('em', attrs={'class': 'money'})[0].text.strip()
+        goal_price = goal_price.replace('원', '').replace(',', '')
+        try:
+            # n/a, 종목명을 입력해 놓은 경우가 존재
+            goal_price = int(goal_price)
+        except:
+            goal_price = None
         opinion = soup.find_all('em', attrs={'class': 'coment'})[0].text.strip()
         body = soup.find_all('td', attrs={'class': 'view_cnt'})[0]
         body_cont = '\n'.join([p.text.strip() for p in body.find_all('p')])
+        body_cont = self.__replace_stopword(body_cont)
         return goal_price, opinion, body_cont
 
     def __crawl_detail(self, rpt_cd):
@@ -79,12 +109,6 @@ class NaverReportCrawler(Crawler):
 
         analyst_report = self.__crawl_report(max_page=10)
         report_df = pd.DataFrame(analyst_report, columns=self.headers)
-        # report_df = report_df.loc[report_df['date'] != '']
-        # report_df['date'] = report_df['date'].apply(lambda x: x.replace('.', '-'))
-        # for col in self.headers[1:]:
-        #     report_df[col] = report_df[col].apply(lambda x: x.replace(',', ''))
-
-        # report_df = report_df.loc[report_df['date']==self.basis_date]
         self.logger.debug(f'Naver report crawling complete')
 
         if save:
