@@ -11,6 +11,7 @@ import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
 from crawler.data_reader import price_crawler
+from crawler.finance_naver import naver_report_crawler
 from screener import screener
 from dev_util.util import mysql_manager, timer, logger, config
 
@@ -30,6 +31,22 @@ def crawl_krxcode_daily():
     krx = krx_crawler.KRXCrawler()
     krx.crawl(save=True)
     _logger.debug(f'crawl_krxcode_daily job done')
+
+def crawl_analyst_report_daily():
+    '''네이버 종목 분석 게시판 수집(애널리스트 리포트)'''
+    config.BASIS_DATE = '2011-08-24'
+    while True:
+        print(config.BASIS_DATE)
+        nreport = naver_report_crawler.NaverReportCrawler()
+        nreport.crawl(save=True)
+        _logger.debug(f'crawl_naver_report_daily job done')
+
+        # next day
+        config.BASIS_DATE = timer.add_date(config.BASIS_DATE, 1)
+
+        if config.BASIS_DATE == '2020-08-08':
+            break
+        break
 
 def crawl_price_daily():
     '''yahoo finance에서 일자별 가격정보 가져오기'''
@@ -66,6 +83,7 @@ def scheduler():
     sched.add_job(crawl_krxcode_daily, 'cron', day_of_week=period.krx_crawler.day_of_week, hour=period.krx_crawler.hour)
     sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
+    sched.add_job(crawl_analyst_report_daily, 'cron', day_of_week=period.report_crawler.day_of_week, hour=period.report_crawler.hour)
     # sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     sched.start()
@@ -75,7 +93,8 @@ def unit_test():
     # crawl_krxcode_daily() # 1
     # crawl_price_daily() # 2
     # crawl_metric_daily() # 3
-    infer_model_daily()
+    crawl_analyst_report_daily() # 4
+    # infer_model_daily()
     pass
 
 if __name__ == '__main__':
