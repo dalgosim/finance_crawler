@@ -33,7 +33,7 @@ class Screener:
                 {tables.COMPANY_LIST_TABLE} t3, (SELECT t1.*, t2.close
                 FROM {tables.METRIC_TABLE} t1, {tables.PRICE_TABLE} t2
                 WHERE
-                    t1.cmp_cd=t2.cmp_cd
+                    LEFT(t1.cmp_cd,6)=LEFT(t2.cmp_cd,6)
                     AND t1.date=t2.date
                     AND t1.date='{self.basis_date}') m1
             WHERE
