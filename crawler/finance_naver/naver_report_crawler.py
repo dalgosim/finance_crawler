@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
-from namedentities import *
 
 from crawler import Crawler
 from dev_util.util import timer, logger, config, mysql_manager, common_sql
