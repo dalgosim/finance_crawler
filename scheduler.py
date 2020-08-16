@@ -10,8 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
-from crawler.data_reader import price_crawler
-from crawler.finance_naver import naver_report_crawler
+from crawler.finance_naver import naver_report_crawler, naver_price_crawler
 from screener import screener
 from dev_util.util import mysql_manager, timer, logger, config
 
@@ -34,23 +33,17 @@ def crawl_krxcode_daily():
 
 def crawl_analyst_report_daily():
     '''네이버 종목 분석 게시판 수집(애널리스트 리포트)'''
-    config.BASIS_DATE = '2011-08-24'
-    while True:
-        print(config.BASIS_DATE)
-        nreport = naver_report_crawler.NaverReportCrawler()
-        nreport.crawl(save=True)
-        _logger.debug(f'crawl_naver_report_daily job done')
+    # while True:
+    nreport = naver_report_crawler.NaverReportCrawler()
+    nreport.crawl(save=True)
+    _logger.debug(f'crawl_naver_report_daily job done')
 
-        # next day
-        config.BASIS_DATE = timer.add_date(config.BASIS_DATE, 1)
-
-        if config.BASIS_DATE == '2020-08-08':
-            break
-        break
+    # next day
+    config.BASIS_DATE = timer.add_date(config.BASIS_DATE, 1)
 
 def crawl_price_daily():
     '''yahoo finance에서 일자별 가격정보 가져오기'''
-    drc = price_crawler.DataReaderCrawler()
+    drc = naver_price_crawler.NaverPriceCrawler()
     drc.crawl(save=True)
     _logger.debug(f'crawl_krxcode_daily job done')
 
@@ -89,12 +82,12 @@ def scheduler():
     sched.start()
 
 def unit_test():
-    # update_date()
-    # crawl_krxcode_daily() # 1
-    # crawl_price_daily() # 2
-    # crawl_metric_daily() # 3
+    update_date()
+    crawl_krxcode_daily() # 1
+    crawl_price_daily() # 2
+    crawl_metric_daily() # 3
     crawl_analyst_report_daily() # 4
-    # infer_model_daily()
+    infer_model_daily()
     pass
 
 if __name__ == '__main__':
