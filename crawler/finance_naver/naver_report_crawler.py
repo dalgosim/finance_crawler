@@ -91,8 +91,12 @@ class NaverReportCrawler(Crawler):
         except:
             goal_price = None
         opinion = soup.find_all('em', attrs={'class': 'coment'})[0].text.strip()
-        body = soup.find_all('td', attrs={'class': 'view_cnt'})[0]
-        body_cont = '\n'.join([p.text.strip() for p in body.find_all('p')])
+        tag = 'p'
+        body = soup.select_one('td.view_cnt > p')
+        if body is None:
+            tag = 'div'
+            body = soup.select_one('td.view_cnt > div')
+        body_cont = '\n'.join([t.text.strip() for t in body.find_all(tag)]).strip()
         body_cont = self.__replace_stopword(body_cont)
         return goal_price, opinion, body_cont
 
