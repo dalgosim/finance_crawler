@@ -33,16 +33,12 @@ def crawl_krxcode_daily():
 
 def crawl_analyst_report_daily():
     '''네이버 종목 분석 게시판 수집(애널리스트 리포트)'''
-    # while True:
     nreport = naver_report_crawler.NaverReportCrawler()
     nreport.crawl(save=True)
     _logger.debug(f'crawl_naver_report_daily job done')
 
-    # next day
-    config.BASIS_DATE = timer.add_date(config.BASIS_DATE, 1)
-
 def crawl_price_daily():
-    '''yahoo finance에서 일자별 가격정보 가져오기'''
+    '''naver finance에서 일자별 가격정보 가져오기'''
     drc = naver_price_crawler.NaverPriceCrawler()
     drc.crawl(save=True)
     _logger.debug(f'crawl_krxcode_daily job done')
