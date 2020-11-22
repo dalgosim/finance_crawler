@@ -101,11 +101,7 @@ if __name__ == '__main__':
     print('Basis date :', config.BASIS_DATE)
     # config.CONFIG.pprint(pformat='json')
 
-    try:
-        print('start!')
-        # unit_test()
-        scheduler()
-        app.run()
-    except KeyboardInterrupt:
-        # Ctrl+C 입력시 예외 발생
-        sys.exit() #종료
+    print('start!')
+    # unit_test()
+    scheduler()
+    app.run()
