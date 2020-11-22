@@ -6,6 +6,7 @@ import time
 import datetime
 import argparse
 from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask
 
 import crawler
 from crawler.comp_fnguide import metric_crawler
@@ -86,9 +87,14 @@ def unit_test():
     infer_model_daily()
     pass
 
+
+
+# for background
+app = Flask(__name__)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--run_type', required=True, choices=['real', 'test'], help='실행모드 입니다.')
+    parser.add_argument('--run_type', default='real', choices=['real', 'test'], help='실행모드 입니다.')
     args = parser.parse_args()
 
     config.load_config(run_type=args.run_type) # test, real
@@ -99,8 +105,7 @@ if __name__ == '__main__':
         print('start!')
         # unit_test()
         scheduler()
-        while True:
-            time.sleep(1)
+        app.run()
     except KeyboardInterrupt:
         # Ctrl+C 입력시 예외 발생
         sys.exit() #종료
