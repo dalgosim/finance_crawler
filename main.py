@@ -74,7 +74,7 @@ def scheduler():
     sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
     sched.add_job(crawl_analyst_report_daily, 'cron', day_of_week=period.report_crawler.day_of_week, hour=period.report_crawler.hour)
-    # sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
+    sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     sched.start()
 
