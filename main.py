@@ -42,7 +42,7 @@ def crawl_price_daily():
     '''naver finance에서 일자별 가격정보 가져오기'''
     drc = naver_price_crawler.NaverPriceCrawler()
     drc.crawl(save=True)
-    _logger.debug(f'crawl_krxcode_daily job done')
+    _logger.debug(f'crawl_price_daily job done')
 
     # infer
     infer_model_daily()
@@ -80,12 +80,13 @@ def scheduler():
     sched.start()
 
 def unit_test():
-    update_date()
-    crawl_krxcode_daily() # 1
+#     update_date()
+    config.BASIS_DATE = "2020-11-23"
+#     crawl_krxcode_daily() # 1
     crawl_price_daily() # 2
-    crawl_metric_daily() # 3
-    crawl_analyst_report_daily() # 4
-    infer_model_daily()
+#     crawl_metric_daily() # 3
+#     crawl_analyst_report_daily() # 4
+#     infer_model_daily()
     pass
 
 
@@ -103,6 +104,6 @@ if __name__ == '__main__':
     # config.CONFIG.pprint(pformat='json')
 
     print('start!')
-    # unit_test()
+#     unit_test()
     scheduler()
     app.run()
