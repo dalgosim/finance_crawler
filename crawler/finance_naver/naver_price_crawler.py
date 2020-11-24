@@ -42,12 +42,14 @@ class NaverPriceCrawler(Crawler):
                 if _list[0].count('') == 6:
                     self.save_del_stock(full_code)
 
+            timer.random_sleep(min_delay=self.delay)
+
             sise_list.extend(_list)
             if _list[0][0].startswith('2010.11') or _list[0][0] == last_date:
                 break
             last_date = _list[0][0]
             page += 1
-            timer.random_sleep(min_delay=self.delay)
+
         return sise_list
 
     def __parse_sise_list(self, res_text):
