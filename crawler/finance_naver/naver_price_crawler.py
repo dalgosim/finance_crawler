@@ -17,19 +17,18 @@ class NaverPriceCrawler(Crawler):
         self.headers = ['date', 'close', 'diff', 'open', 'high', 'low', 'volume']
         self.price_column = ['date', 'cmp_cd', 'open', 'close', 'high', 'low', 'volume']
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
-        self.prev_cmp_cd = self.__get_prev_comp_list()
+        self.del_table = config.CONFIG.MYSQL_CONFIG.TABLES.COMPANY_DEL_LIST_TABLE
+        self.del_cmp_cd = self.__get_del_comp_list()
 
-    def __get_prev_comp_list(self):
-        query = f'''
-        SELECT cmp_cd FROM {self.table}
-        WHERE date=(SELECT MAX(date) FROM {self.table});
-        '''
-        cmp_df = self.mysql.select_dataframe(query, log='get_prev_comp_list')
+    def __get_del_comp_list(self):
+        query = f'''SELECT cmp_cd FROM {self.del_table};'''
+        cmp_df = self.mysql.select_dataframe(query, log='get_del_comp_list')
         cmp_cd_list = cmp_df['cmp_cd'].values.tolist()
-        self.logger.debug(f'cmp_cd_list : {len(cmp_cd_list)}, {cmp_cd_list[:5]}')
+        self.logger.debug(f'del cmp_cd list : {len(cmp_cd_list)}, {cmp_cd_list[:5]}')
         return cmp_cd_list
 
-    def __crawl_stock_price(self, stock_code, max_page=250):
+    def __crawl_stock_price(self, full_code, max_page=250):
+        stock_code = full_code[:6]
         sise_list = []
         page = 1
         last_date = ''
@@ -37,6 +36,12 @@ class NaverPriceCrawler(Crawler):
             _url = self.SISE_URL.format(code=stock_code, page=page)
             res = requests.get(_url)
             _list = self.__parse_sise_list(res.text)
+
+            # 페이지 정보가 없는 종목(ex. 상장폐지)
+            if page==1 and len(_list)>0:
+                if _list[0].count('') == 6:
+                    self.save_del_stock(full_code)
+
             sise_list.extend(_list)
             if _list[0][0].startswith('2010.11') or _list[0][0] == last_date:
                 break
@@ -62,10 +67,14 @@ class NaverPriceCrawler(Crawler):
         self.logger.debug(f'Price crawling start ({self.basis_date})')
         accum_df = pd.DataFrame([])
         limit = 5 if config.TEST_MODE else 0
-        cmp_cd_list = common_sql.get_company_list(limit)['cmp_cd'].values
-        for _, code in enumerate(cmp_cd_list):
-            code = code[:6]
-            stock_price = self.__crawl_stock_price(code, max_page=1)
+        cmp_cd_list = list(common_sql.get_company_list(limit)['cmp_cd'].values)
+        
+        for del_code in self.del_cmp_cd:
+            cmp_cd_list.remove(del_code)
+
+        for _, full_code in enumerate(cmp_cd_list):
+            self.logger.debug(f'Naver price crawling : {full_code}')
+            stock_price = self.__crawl_stock_price(full_code, max_page=1)
             price_df = pd.DataFrame(stock_price, columns=self.headers)
             price_df = price_df.loc[price_df['date'] != '']
             price_df['date'] = price_df['date'].apply(lambda x: x.replace('.', '-'))
@@ -73,7 +82,7 @@ class NaverPriceCrawler(Crawler):
                 price_df[col] = price_df[col].apply(lambda x: x.replace(',', ''))
 
             price_df = price_df.loc[price_df['date']>=self.basis_date]
-            price_df['cmp_cd'] = code
+            price_df['cmp_cd'] = full_code
 
             accum_df = pd.concat([accum_df, price_df], sort=False)
         self.logger.debug(f'Naver price crawling complete')
@@ -81,6 +90,13 @@ class NaverPriceCrawler(Crawler):
         if save:
             self.save(accum_df)
         return accum_df
+    
+    def save_del_stock(self, code):
+        self.logger.debug(f'Removed stock save start')
+        df = pd.DataFrame([code], columns=['cmp_cd'])
+        print(df)
+        self.mysql.insert_dataframe(df, self.del_table)
+        self.logger.debug(f'Removed stock save complete')
 
     def save(self, df):
         if df is not None:

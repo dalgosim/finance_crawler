@@ -4,6 +4,6 @@ dotmap
 apscheduler
 pymysql
 sqlalchemy
-xgboost
+xgboost==1.2.1
 beautifulsoup4
 pandas_datareader
