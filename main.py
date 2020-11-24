@@ -64,6 +64,7 @@ def infer_model_daily():
 
 def update_date():
     config.BASIS_DATE = timer.get_now('%Y-%m-%d')
+    _logger.debug(f'current basis_date : {config.BASIS_DATE}')
 
 # scheduler
 def scheduler():
