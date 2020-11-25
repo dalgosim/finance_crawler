@@ -96,7 +96,6 @@ class NaverPriceCrawler(Crawler):
     def save_del_stock(self, code):
         self.logger.debug(f'Removed stock save start')
         df = pd.DataFrame([code], columns=['cmp_cd'])
-        print(df)
         self.mysql.insert_dataframe(df, self.del_table)
         self.logger.debug(f'Removed stock save complete')
 
