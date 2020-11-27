@@ -1,5 +1,5 @@
 {
-    "MODEL_NAME":"metricstudio_xgb_20190816_kospi",
+    "MODEL_NAME":"metricstudio_xgb1.2.1_2class_201127.pkl",
     "PERIOD":{
         "update_date":{"day_of_week":"mon-sun", "hour":"8,20"},
         "krx_crawler":{"day_of_week":"mon-fri", "hour":"21"},
