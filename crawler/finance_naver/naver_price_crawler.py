@@ -74,8 +74,9 @@ class NaverPriceCrawler(Crawler):
         for del_code in self.del_cmp_cd:
             cmp_cd_list.remove(del_code)
 
-        for _, full_code in enumerate(cmp_cd_list):
-            self.logger.debug(f'Naver price crawling : {full_code}')
+        for i, full_code in enumerate(cmp_cd_list):
+            if i%100==0:
+                self.logger.debug(f'price crawling... ({i}/{len(cmp_cd_list)})')
             stock_price = self.__crawl_stock_price(full_code, max_page=1)
             price_df = pd.DataFrame(stock_price, columns=self.headers)
             price_df = price_df.loc[price_df['date'] != '']
