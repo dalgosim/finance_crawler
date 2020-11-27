@@ -30,19 +30,19 @@ def crawl_krxcode_daily():
     '''KRX에서 종목 코드 가져오기'''
     krx = krx_crawler.KRXCrawler()
     krx.crawl(save=True)
-    _logger.debug(f'crawl_krxcode_daily job done')
+    _logger.info(f'crawl_krxcode_daily job done')
 
 def crawl_analyst_report_daily():
     '''네이버 종목 분석 게시판 수집(애널리스트 리포트)'''
     nreport = naver_report_crawler.NaverReportCrawler()
     nreport.crawl(save=True)
-    _logger.debug(f'crawl_naver_report_daily job done')
+    _logger.info(f'crawl_naver_report_daily job done')
 
 def crawl_price_daily():
     '''naver finance에서 일자별 가격정보 가져오기'''
     drc = naver_price_crawler.NaverPriceCrawler()
     drc.crawl(save=True)
-    _logger.debug(f'crawl_price_daily job done')
+    _logger.info(f'crawl_price_daily job done')
 
     # infer
     infer_model_daily()
@@ -51,7 +51,7 @@ def crawl_metric_daily():
     '''fnguide에서 재무제표 가져오기'''
     sp = metric_crawler.MetricCrawler()
     sp.crawl(save=True)
-    _logger.debug(f'crawl_metric_daily job done')
+    _logger.info(f'crawl_metric_daily job done')
 
     # infer
     infer_model_daily()
@@ -60,11 +60,13 @@ def infer_model_daily():
     '''model inference후 저장'''
     scr = screener.Screener()
     scr.recommend(save=True)
-    _logger.debug(f'infer_model_daily job done')
+    _logger.info(f'infer_model_daily job done')
 
 def update_date():
     config.BASIS_DATE = timer.get_now('%Y-%m-%d')
-    _logger.debug(f'current basis_date : {config.BASIS_DATE}')
+    _logger.info('======================================')
+    _logger.info(f'current basis_date : {config.BASIS_DATE}')
+    _logger.info('======================================')
 
 # scheduler
 def scheduler():
@@ -75,17 +77,18 @@ def scheduler():
     sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
     sched.add_job(crawl_analyst_report_daily, 'cron', day_of_week=period.report_crawler.day_of_week, hour=period.report_crawler.hour)
-    sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
+#     sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     sched.start()
+    _logger.debug('scheduler start!')
 
 def unit_test():
 #     update_date()
-    config.BASIS_DATE = "2020-11-23"
+    config.BASIS_DATE = "2020-11-25"
 #     crawl_krxcode_daily() # 1
-    crawl_price_daily() # 2
+#     crawl_price_daily() # 2
 #     crawl_metric_daily() # 3
-#     crawl_analyst_report_daily() # 4
+    crawl_analyst_report_daily() # 4
 #     infer_model_daily()
     pass
 
@@ -103,7 +106,6 @@ if __name__ == '__main__':
     print('Basis date :', config.BASIS_DATE)
     # config.CONFIG.pprint(pformat='json')
 
-    print('start!')
 #     unit_test()
     scheduler()
     app.run()
