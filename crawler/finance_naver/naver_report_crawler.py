@@ -26,6 +26,13 @@ class NaverReportCrawler(Crawler):
         self.stopword = {
             '\xa0':' '
         }
+
+        self.full_cmp_cd_list = dict()
+        for cmp_cd in common_sql.get_company_list()['cmp_cd'].values:
+            self.full_cmp_cd_list[str(cmp_cd[:6])] = cmp_cd
+    
+    def __find_full_cmp_cd(self, cmp_cd):
+        return self.full_cmp_cd_list.get(cmp_cd, cmp_cd)
     
     def __replace_stopword(self, text):
         for key in self.stopword.keys():
@@ -71,7 +78,7 @@ class NaverReportCrawler(Crawler):
                     items = [item.text.strip() for item in td]
                     cmp_cd = self.cmp_patt.search(td[0].a.attrs['href']).group(1)       # td[0] == 종목명
                     report_code = self.nid_patt.search(td[1].a.attrs['href']).group(1)  # td[1] == 제목
-                    items.append(cmp_cd)
+                    items.append(self.__find_full_cmp_cd(cmp_cd))
                     items.append(report_code)
                     if self.check_redun.get(report_code, True): # 중복 리포트는 제외
                         items.extend(self.__crawl_detail(report_code))
@@ -91,12 +98,10 @@ class NaverReportCrawler(Crawler):
         except:
             goal_price = None
         opinion = soup.find_all('em', attrs={'class': 'coment'})[0].text.strip()
-        tag = 'p'
         body = soup.select_one('td.view_cnt > p')
         if body is None:
-            tag = 'div'
             body = soup.select_one('td.view_cnt > div')
-        body_cont = '\n'.join([t.text.strip() for t in body.find_all(tag)]).strip()
+        body_cont = '\n'.join([t.text.strip() for t in body.find_all(['p', 'div'])]).strip()
         body_cont = self.__replace_stopword(body_cont)
         return goal_price, opinion, body_cont
 
@@ -110,7 +115,7 @@ class NaverReportCrawler(Crawler):
     def crawl(self, save=False):
         self.logger.debug(f'Naver report crawling start ({self.basis_date})')
 
-        analyst_report = self.__crawl_report(max_page=10)
+        analyst_report = self.__crawl_report(max_page=12)
         report_df = pd.DataFrame(analyst_report, columns=self.headers)
         self.logger.debug(f'Naver report crawling complete')
 
