@@ -21,7 +21,7 @@ class Screener:
 
     def _load_model(self, model_name):
         model = None
-        with open(f'finance_ml/models/{model_name}.pkl', 'rb') as f:
+        with open(f'finance_ml/models/{model_name}', 'rb') as f:
             model = pickle.load(f)
         return model
 
