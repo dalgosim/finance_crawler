@@ -38,6 +38,13 @@ def crawl_analyst_report_daily():
     nreport.crawl(save=True)
     _logger.info(f'crawl_naver_report_daily job done')
 
+def crawl_recommendation_item_daily():
+    '''네이버 종목추천 게시판 수집(지금은 사라짐)'''
+    nrecom = recommendation_item_cralwer.RecommendationItemCrawler()
+    nrecom.crawl(proc=1, save=False)
+    nrecom.crawl(proc=2, save=False)
+    _logger.debug(f'crawl_naver_recom_daily job done')
+
 def crawl_price_daily():
     '''naver finance에서 일자별 가격정보 가져오기'''
     drc = naver_price_crawler.NaverPriceCrawler()
@@ -77,6 +84,7 @@ def scheduler():
     sched.add_job(crawl_price_daily, 'cron', day_of_week=period.price_crawler.day_of_week, hour=period.price_crawler.hour)
     sched.add_job(crawl_metric_daily, 'cron', day_of_week=period.metric_crawler.day_of_week, hour=period.metric_crawler.hour)
     sched.add_job(crawl_analyst_report_daily, 'cron', day_of_week=period.report_crawler.day_of_week, hour=period.report_crawler.hour)
+    sched.add_job(crawl_recommendation_item_daily, 'cron', day_of_week=period.recom_inout_crawler.day_of_week, hour=period.recom_inout_crawler.hour)
 #     sched.add_job(infer_model_daily, 'cron', day_of_week=period.model_infer.day_of_week, hour=period.model_infer.hour)
     # sched.add_job(scheduler.crawl_daily_inout, 'cron', day_of_week=weekday, hour='9-15', minute='0-59/30')
     sched.start()
