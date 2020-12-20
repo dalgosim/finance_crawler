@@ -41,8 +41,8 @@ def crawl_analyst_report_daily():
 def crawl_recommendation_item_daily():
     '''네이버 종목추천 게시판 수집(지금은 사라짐)'''
     nrecom = recommendation_item_cralwer.RecommendationItemCrawler()
-    nrecom.crawl(proc=1, save=False)
-    nrecom.crawl(proc=2, save=False)
+    nrecom.crawl(proc=1, save=True)
+    nrecom.crawl(proc=2, save=True)
     _logger.debug(f'crawl_naver_recom_daily job done')
 
 def crawl_price_daily():
