@@ -6,7 +6,8 @@
         "price_crawler":{"day_of_week":"mon-fri", "hour":"22"},
         "metric_crawler":{"day_of_week":"mon-fri", "hour":"22"},
         "model_infer":{"day_of_week":"mon-fri", "hour":"8"},
-        "report_crawler":{"day_of_week":"mon-sun", "hour":"21"}
+        "report_crawler":{"day_of_week":"mon-sun", "hour":"0"},
+        "recom_inout_crawler":{"day_of_week":"mon-sun", "hour":"0"}
     },
     "CRAWL_DELAY":3
 }
