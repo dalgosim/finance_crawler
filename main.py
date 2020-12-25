@@ -11,7 +11,7 @@ from flask import Flask
 import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
-from crawler.finance_naver import naver_report_crawler, naver_price_crawler
+from crawler.finance_naver import naver_report_crawler, naver_price_crawler, recommendation_item_cralwer
 from screener import screener
 from dev_util.util import mysql_manager, timer, logger, config
 
