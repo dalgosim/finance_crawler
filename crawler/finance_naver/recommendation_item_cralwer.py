@@ -40,6 +40,13 @@ class RecommendationItemCrawler(Crawler):
         self.RECOMM_URL = 'https://recommend.wisereport.co.kr/v1/Home/GetInOut'
         self.in_table = config.CONFIG.MYSQL_CONFIG.TABLES.NAVER_IN_TABLE
         self.out_table = config.CONFIG.MYSQL_CONFIG.TABLES.NAVER_OUT_TABLE
+        
+        self.full_cmp_cd_list = dict()
+        for cmp_cd in common_sql.get_company_list()['cmp_cd'].values:
+            self.full_cmp_cd_list[str(cmp_cd[:6])] = cmp_cd
+
+    def __find_full_cmp_cd(self, cmp_cd):
+        return self.full_cmp_cd_list.get(cmp_cd, cmp_cd)
 
     def __crawl(self, date, proc):
         self.param['startDt'] = date
@@ -72,6 +79,7 @@ class RecommendationItemCrawler(Crawler):
 
         if len(recom_df) > 0:
             recom_df = recom_df[self.in_cols] if proc==1 else recom_df[self.out_cols]
+            recom_df['cmp_cd'] = recom_df['cmp_cd'].apply(lambda x: self.__find_full_cmp_cd(x))
         self.logger.debug(f'RecommendationItem crawling complete (proc : {proc}, {self.basis_date}) : {len(recom_df)}')
 
         if save:
