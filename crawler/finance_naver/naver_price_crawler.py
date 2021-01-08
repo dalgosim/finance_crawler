@@ -45,6 +45,8 @@ class NaverPriceCrawler(Crawler):
             timer.random_sleep(min_delay=self.delay)
 
             sise_list.extend(_list)
+            if len(_list)==0:
+                break
             if _list[0][0].startswith('2010.11') or _list[0][0] == last_date:
                 break
             last_date = _list[0][0]

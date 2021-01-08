@@ -50,17 +50,18 @@ class MetricCrawler(Crawler):
             cmp_cd_list.remove(del_code)
 
         for i, cmp_cd in enumerate(cmp_cd_list):
-            if not fncode.isnumeric():
-                continue
-            
             if i%100==0:
                 self.logger.debug(f'metric crawling... ({i}/{len(cmp_cd_list)})')
             fncode = cmp_cd[:6] # .KS, .KQ 태그 제외
             header = {
                 'Host': 'comp.fnguide.com',
             }
-            cmp_row = dict()
+            
+            if not fncode.isnumeric():
+                continue
             gicode = 'A%06d'%int(fncode)
+
+            cmp_row = dict()
             cmp_row['cmp_cd'] = cmp_cd
 
             for url in [self.INVEST_URL, self.FINANCE_RATIO_URL]:
