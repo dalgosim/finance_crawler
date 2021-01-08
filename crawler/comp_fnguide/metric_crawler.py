@@ -50,6 +50,9 @@ class MetricCrawler(Crawler):
             cmp_cd_list.remove(del_code)
 
         for i, cmp_cd in enumerate(cmp_cd_list):
+            if not fncode.isnumeric():
+                continue
+            
             if i%100==0:
                 self.logger.debug(f'metric crawling... ({i}/{len(cmp_cd_list)})')
             fncode = cmp_cd[:6] # .KS, .KQ 태그 제외
