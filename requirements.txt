@@ -8,3 +8,4 @@ xgboost==1.2.1
 beautifulsoup4
 pandas_datareader
 FinanceDataReader
+ta
