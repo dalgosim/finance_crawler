@@ -19,6 +19,8 @@ class NaverPriceCrawler(Crawler):
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
         self.del_table = config.CONFIG.MYSQL_CONFIG.TABLES.COMPANY_DEL_LIST_TABLE
         self.del_cmp_cd = self.__get_del_comp_list()
+        
+        self.req_header = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'}
 
     def __get_del_comp_list(self):
         query = f'''SELECT cmp_cd FROM {self.del_table};'''
@@ -34,7 +36,7 @@ class NaverPriceCrawler(Crawler):
         last_date = ''
         while page <= max_page:
             _url = self.SISE_URL.format(code=stock_code, page=page)
-            res = requests.get(_url)
+            res = requests.get(_url, headers=self.req_header)
             _list = self.__parse_sise_list(res.text)
 
             # 페이지 정보가 없는 종목(ex. 상장폐지)
