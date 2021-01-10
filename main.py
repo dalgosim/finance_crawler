@@ -12,7 +12,7 @@ import crawler
 from crawler.comp_fnguide import metric_crawler
 from crawler.kind_krx import krx_crawler
 from crawler.finance_naver import naver_report_crawler, naver_price_crawler, recommendation_item_cralwer
-from screener import screener
+from screener import screener, chart_index
 from dev_util.util import mysql_manager, timer, logger, config
 
 #################
@@ -52,6 +52,7 @@ def crawl_price_daily():
     _logger.info(f'crawl_price_daily job done')
 
     # infer
+    calc_chart_index_daily()
     infer_model_daily()
 
 def crawl_metric_daily():
@@ -69,6 +70,12 @@ def infer_model_daily():
     scr.recommend(save=True)
     _logger.info(f'infer_model_daily job done')
 
+def calc_chart_index_daily():
+    '''chart index 계산 후 저장'''
+    chart = chart_index.ChartIndexCalculator()
+    chart.calc_chart_index(save=True)
+    _logger.info(f'calc_chart_index_daily job done')
+    
 def update_date():
     config.BASIS_DATE = timer.get_now('%Y-%m-%d')
     _logger.info('======================================')
