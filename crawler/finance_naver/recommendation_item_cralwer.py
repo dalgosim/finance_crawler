@@ -99,7 +99,3 @@ class RecommendationItemCrawler(Crawler):
                 self.logger.debug(f'Recom_out save complete')
         else:
             self.logger.debug(f'Recom save fail : DataFrame is empty!')
-
-    def save_price(self, recom_df, table):
-        if len(recom_df) > 0:
-            self.mysql.insert_dataframe(recom_df, table)
