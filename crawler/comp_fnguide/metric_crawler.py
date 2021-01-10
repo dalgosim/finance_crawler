@@ -29,25 +29,11 @@ class MetricCrawler(Crawler):
     def __init__(self):
         super().__init__()
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.METRIC_TABLE
-        self.del_table = config.CONFIG.MYSQL_CONFIG.TABLES.COMPANY_DEL_LIST_TABLE
-        self.del_cmp_cd = self.__get_del_comp_list()
-
-    def __get_del_comp_list(self):
-        query = f'''SELECT cmp_cd FROM {self.del_table};'''
-        cmp_df = self.mysql.select_dataframe(query, log='get_del_comp_list')
-        cmp_cd_list = cmp_df['cmp_cd'].values.tolist()
-        self.logger.debug(f'del cmp_cd list : {len(cmp_cd_list)}, {cmp_cd_list[:5]}')
-        return cmp_cd_list
-        
         
     def crawl(self, save=False):
         self.logger.debug(f'Fnguide crawling start')
-        limit = 5 if config.TEST_MODE else 0
         result = []
-        cmp_cd_list = list(common_sql.get_company_list(limit)['cmp_cd'].values)
-        
-        for del_code in self.del_cmp_cd:
-            cmp_cd_list.remove(del_code)
+        cmp_cd_list = list(common_sql.get_company_list_without_del()['cmp_cd'].values)
 
         for i, cmp_cd in enumerate(cmp_cd_list):
             if i%100==0:

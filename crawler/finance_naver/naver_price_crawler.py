@@ -17,17 +17,8 @@ class NaverPriceCrawler(Crawler):
         self.headers = ['date', 'close', 'diff', 'open', 'high', 'low', 'volume']
         self.price_column = ['date', 'cmp_cd', 'open', 'close', 'high', 'low', 'volume']
         self.table = config.CONFIG.MYSQL_CONFIG.TABLES.PRICE_TABLE
-        self.del_table = config.CONFIG.MYSQL_CONFIG.TABLES.COMPANY_DEL_LIST_TABLE
-        self.del_cmp_cd = self.__get_del_comp_list()
         
         self.req_header = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'}
-
-    def __get_del_comp_list(self):
-        query = f'''SELECT cmp_cd FROM {self.del_table};'''
-        cmp_df = self.mysql.select_dataframe(query, log='get_del_comp_list')
-        cmp_cd_list = cmp_df['cmp_cd'].values.tolist()
-        self.logger.debug(f'del cmp_cd list : {len(cmp_cd_list)}, {cmp_cd_list[:5]}')
-        return cmp_cd_list
 
     def __crawl_stock_price(self, full_code, max_page=250):
         stock_code = full_code[:6]
@@ -72,11 +63,7 @@ class NaverPriceCrawler(Crawler):
     def crawl(self, save=False):
         self.logger.debug(f'Price crawling start ({self.basis_date})')
         accum_df = pd.DataFrame([])
-        limit = 5 if config.TEST_MODE else 0
-        cmp_cd_list = list(common_sql.get_company_list(limit)['cmp_cd'].values)
-        
-        for del_code in self.del_cmp_cd:
-            cmp_cd_list.remove(del_code)
+        cmp_cd_list = list(common_sql.get_company_list_without_del()['cmp_cd'].values)
 
         for i, full_code in enumerate(cmp_cd_list):
             if i%100==0:
